@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
    s.platform = Gem::Platform::RUBY
    s.rubyforge_project = 'webcomic-middleman'
    s.has_rdoc = false
-   s.date = %q{2011-07-22}
+   s.date = Time.now.strftime "%Y-%m-%d"
 
    s.authors = ["Matt McCray"]
    s.email = %q{matt@inkwellian.com}
@@ -22,11 +22,8 @@ Gem::Specification.new do |s|
    s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
    s.require_paths = ["lib"]
    
-   s.add_dependency 'sinatra'
+   s.add_dependency 'middleman'
    s.add_dependency 'tilt'
    s.add_dependency 'active_support'
-   s.add_dependency 'trollop'
-   s.add_dependency 'haml'
-   s.add_dependency 'sass'
    
 end
