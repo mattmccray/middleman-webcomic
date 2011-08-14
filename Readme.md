@@ -1,0 +1,2 @@
+# Webcomic for MiddleMan
+
