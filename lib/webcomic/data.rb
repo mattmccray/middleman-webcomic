@@ -1,4 +1,12 @@
-require 'active_support/core_ext/hash'
+require 'thor'
+
+class String
+  def create_slug
+    s= self.downcase.gsub(/'/, '').gsub(/[^a-z0-9]+/, '-')
+    s.chop! if s[-1] == '-'
+    s
+  end
+end
 
 module Webcomic
 
@@ -9,8 +17,7 @@ module Webcomic
       all << comic if comic.publishable?
     end
 
-    all.sort! {|x,y| y.publish_date <=> x.publish_date }
-    
+    all.sort! {|x,y| y.pub_date <=> x.pub_date }
     # Update all the position info...
     cl= all.length
     all.each_with_index do |comic, i|
@@ -20,9 +27,57 @@ module Webcomic
       comic.last= all[0]
       comic.next= i > 0  ? all[i - 1] :  nil
       comic.prev= i < (cl - 1) ? all[i + 1] : nil
+      if app.settings.webcomic_enable_stories and comic.story 
+        Story.find_or_create_for comic
+      end
     end
     
-    all
+    stories= Story.all
+    stories.sort! {|x,y| y.pub_date <=> x.pub_date }
+    sl= stories.length
+    stories.each_with_index do |story, i|
+      story.position= (sl - i)
+      # puts "##{story.position} - #{story.title}(#{story.slug}): #{story.comics.length}"
+    end
+    
+    [all, stories]
+  end
+  
+  class Story
+    attr_accessor :title, :slug, :comics, :position
+    
+    def initialize(title)
+      @title= title
+      @slug= @title.create_slug
+      @comics= []
+      @position= nil
+    end
+    
+    def pub_date
+      @comics.last.pub_date
+    end
+    
+    def add_comic(comic)
+      @comics << comic
+    end
+    
+    class << self
+      
+      def all
+        @stories ||= {}
+        @stories.values
+      end
+      
+      def find_or_create_for(comic)
+        title= comic.story
+        @stories ||= {}
+        unless @stories.has_key? title
+          story= @stories[title]= new(title)
+        end
+        @stories[title].add_comic comic
+        @stories[title]
+      end
+    end
   end
 
   class Comic
@@ -39,7 +94,7 @@ module Webcomic
       @prev= nil
       @first= nil
       @last= nil
-      @metadata= ::HashWithIndifferentAccess.new    
+      @metadata= ::Thor::CoreExt::HashWithIndifferentAccess.new({})
       @metadata[:ext]= File.extname(path)
       @metadata[:publish_date]= Time.now.strftime "%Y-%m-%d"
       @metadata[:slug]= File.basename(path).gsub( @metadata[:ext], '').gsub('.comic','')
@@ -52,11 +107,19 @@ module Webcomic
         @metadata[:slug]= $4
       end
       
-      @metadata[:title]= @metadata[:slug].titleize
+      @metadata[:title]= @metadata[:slug].titleize rescue @metadata[:slug]
       @metadata[:slug]= @metadata[:slug].downcase
       
       # Parse yaml header...
-      read_yaml()
+      begin
+        read_yaml()
+      rescue
+        puts "Error reading YAML! #{self.slug}"
+      end
+      
+      if self.filename.nil?
+        throw "Filename Missing: Comics must define a filename! (#{self.slug})"
+      end
 
       if publishable?
         # Dont' waste time if it's not a publishable comic
@@ -76,6 +139,8 @@ module Webcomic
     def method_missing(key, value=nil)
       if @metadata.has_key? key
         @metadata[key]
+      elsif @metadata.has_key? key.to_s
+        @metadata[key.to_s]
       else
         #super Should it throw an error?
         nil
@@ -92,17 +157,22 @@ module Webcomic
         now= Time.now
         now_string = now.strftime "%Y-%m-%d"
         today= Date.parse(now_string)
-        case self.publish_date
+        pubdate= self.pub_date
+        case pubdate
         when String
-          self.publish_date <= now_string
+          pubdate <= now_string
         when Time
-          self.publish_date <= now
+          pubdate <= now
         when Date
-          self.publish_date <= today
+          pubdate <= today
         else
           true
         end
       end
+    end
+  
+    def pub_date
+      self.publish_on || self.publish_date || Time.now
     end
     
   private

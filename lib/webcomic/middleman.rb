@@ -18,16 +18,22 @@ module Middleman
           
           # ???
           app.set :webcomic_enable_stories, false
+          app.set :webcomic_story_uri, "story"
+          app.set :webcomic_story_template, "/comics/story_template.html"
+
           app.set :webcomic_enable_tags, false
           app.set :webcomic_sort_by, :publish_date # or slug? and metadata
+          app.set :webcomic_slug_field, :slug
 
-      
           app.helpers ::Webcomic::Helpers
       
           app.after_configuration do
-            comics= ::Webcomic.load_from( File.join(app.root, app.settings.webcomic_source), app )
+            comics, stories= ::Webcomic.load_from( File.join(app.root, app.settings.webcomic_source), app )
+
+            # puts comics.inspect
 
             comics.each do |comic|
+              # puts "-> #{comic.filename} (#{comic.metadata.inspect})"
               src_path= File.join(app.root, app.settings.webcomic_source_images, comic.filename)
               tgt_path= File.join(app.views, app.settings.webcomic_images, comic.filename)
               
@@ -41,16 +47,28 @@ module Middleman
                 end
               end
               
+              slug_field= app.settings.webcomic_slug_field
               if File.exists? tgt_path
-                app.page "/#{app.settings.webcomic_uri}/#{comic.slug}.html", :proxy=>app.settings.webcomic_template, :ignore=>true do
+                app.page "/#{app.settings.webcomic_uri}/#{comic[slug_field]}.html", :proxy=>app.settings.webcomic_template, :ignore=>true do
                   @comic= comic
                 end
               else
-                puts "Skipping #{comic.filename} (#{comic.slug})"
+                puts "Skipping #{comic.filename} (#{comic[slug_field]})"
               end
             end
-
-            app.data_content 'webcomic', comics
+            
+            if app.settings.webcomic_enable_stories
+              stories.each do |story|
+                app.page "/#{app.settings.webcomic_story_uri}/#{story.slug}.html", :proxy=>app.settings.webcomic_story_template, :ignore=>true do
+                  @story= story
+                end
+              end
+            end
+            
+            app.data_content 'webcomic', {
+              :strips=>comics,
+              :stories=>stories
+            }
           end
           
           ::Webcomic::Admin.define app

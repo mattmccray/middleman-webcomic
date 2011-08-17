@@ -24,3 +24,10 @@ This is how you'll setup the runtime, using bundler:
     require 'middleman'
 
     run Middleman.server
+
+# Live Sites
+
+This extension is used in conjunction with MiddleMan on the following sites:
+
+* [ZooDotCom](http://www.zoodotcom.com)
+* [Tactless Comics](http://tactless.inkwellian.com)

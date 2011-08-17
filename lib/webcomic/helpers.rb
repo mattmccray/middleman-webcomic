@@ -6,11 +6,11 @@ module Webcomic
     end
     
     def first_comic
-      data.webcomic.last
+      data.webcomic.strips.last
     end
 
     def last_comic
-      data.webcomic.first
+      data.webcomic.strips.first
     end
 
     def next_comic
@@ -32,7 +32,7 @@ module Webcomic
     alias :current_comic_image_url :current_comic_image
     
     def comic_path_url(comic)
-      "/#{settings.webcomic_uri}/#{comic.slug}"
+      "/#{settings.webcomic_uri}/#{comic[settings.webcomic_slug_field]}"
     end
     alias :comic_path_for :comic_path_url
     
@@ -54,6 +54,26 @@ module Webcomic
 
     def prev_comic_path
       comic_path_for prev_comic
+    end
+    
+
+    # Story Helpers
+    def start_story_path_for(object)
+      story = if object.is_a? Story
+        object
+      else # it's a comic... right?
+        data.webcomic.stories.detect  {|s| s.title == object.story }
+      end
+      comic_path_for story.comics.last
+    end
+
+    def story_path_for(object)
+      story = if object.is_a? Story
+        object
+      else # it's a comic... right?
+        data.webcomic.stories.detect  {|s| s.title == object.story }
+      end
+      "/#{settings.webcomic_story_uri}/#{story.slug}"
     end
     
   end

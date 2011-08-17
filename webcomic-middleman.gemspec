@@ -24,6 +24,6 @@ Gem::Specification.new do |s|
    
    s.add_dependency 'middleman'
    s.add_dependency 'tilt'
-   s.add_dependency 'active_support'
+   s.add_dependency 'thor'
    
 end
