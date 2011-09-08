@@ -36,7 +36,7 @@ module Middleman
             # puts comics.inspect
 
             comics.each do |comic|
-              # puts "-> #{comic.filename} (#{comic.metadata.inspect})"
+              #puts "-> #{comic.filename} (#{comic.metadata.inspect})"
               src_path= File.join(app.root, app.settings.webcomic_source_images, comic.filename)
               tgt_path= File.join(app.views, app.settings.webcomic_images, comic.filename)
               
@@ -52,6 +52,7 @@ module Middleman
               
               slug_field= app.settings.webcomic_slug_field
               if File.exists? tgt_path
+                #puts "Building: /#{app.settings.webcomic_uri}/#{comic[slug_field]}.html"
                 app.page "/#{app.settings.webcomic_uri}/#{comic[slug_field]}.html", :proxy=>app.settings.webcomic_template, :ignore=>true do
                   @comic= comic
                 end
@@ -73,8 +74,6 @@ module Middleman
               :stories=>stories
             }
           end
-          
-          ::Middleman::Webcomic::Admin.define app
         end
         alias :included :registered
 
@@ -158,7 +157,7 @@ module Middleman
         
         # Feed Helpers
         
-        def feed_data
+        def webcomic_feed_data
           data.webcomic.strips[0...10]
         end
         

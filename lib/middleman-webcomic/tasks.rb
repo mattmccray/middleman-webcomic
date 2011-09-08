@@ -14,41 +14,40 @@ namespace :webcomic do
 desc "Creates a new Comic notes entry from image"
 task :create do
   
-  puts 'Coming Soon!'
+  require 'yaml'
+  require 'date'
+  Dir["#{IMAGE_PATH}/*.{jpg,jpe,jpeg,gif,png}"].each do |img_file|
+    img_filename = File.basename( img_file )
+    basename= img_filename.gsub( File.extname(img_filename), '' )
+    note_filename = "#{basename}.comic.markdown"
+    path= File.join NOTES_PATH, note_filename
+    
+    unless File.exists? path
+      create_notes = ask("Notes for '#{img_filename}' are missing, create? [Yn] ")
+      if create_notes.upcase[0] != 'N'
+        meta= {
+          'title' => basename,
+          'slug' => basename,
+          'publish_date' => Date.today,
+          'filename' => img_filename
+        }.to_yaml
+        
+        meta << "---\n\n"
+        meta << "\n\n"
+        
+        File.open(path, "w") do |file|
+          file.write meta
+        end
+        puts "Created #{path}"
+      end
+    end
+  end
   
-  # require 'yaml'
-  # 
-  # today= Time.now.strftime('%y%m%d')
-  # title = ask('Title: ')
-  # slug = title.empty? ? 'untitled' : title.strip.slugify
-  # filename= "#{today}-#{slug}.comic.markdown"
-  # path= "#{NOTES_PATH}/#{filename}"
-  # 
-  # 
-  # article = {
-  #   'title' => title, 
-  #   'slug' => slug,
-  #   'publish_date' => Time.now.strftime("%Y-%m-%d"),
-  #   'filename' => 'FILENAME_HERE'
-  # }.to_yaml
-  # 
-  # article << "---\n\n"
-  # article << "Once upon a time...\n\n"
-  # 
-  # unless File.exist? path
-  #   File.open(path, "w") do |file|
-  #     file.write article
-  #   end
-  #   puts "Comic notes were created for you at #{path}."
-  #   `mate #{path}`
-  # else
-  #   puts "I can't create the article, #{path} already exists."
-  # end
 end
 
-desc "Validates that there are notes for each image"
-task :validate do
-  ptus "Coming Soon!"
-end
+# desc "Validates that there are notes for each image"
+# task :validate do
+#   ptus "Coming Soon!"
+# end
 
 end

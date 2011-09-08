@@ -1,14 +1,14 @@
+div.row.sidebars
 
-div.row
   div.col.span-8
-
     div.box.archive
       h1 Comic Archive
 
       ol.comic-list
-        - data.webcomic.strips.each_with_index do |comic,i|
+        - data.webcomic.strips.reverse.each_with_index do |comic,i|
           li value=comic.position
             a href=comic_path_for(comic) = comic.title
 
-  div.col.span-4
-    == partial 'sidebar'
+
+  div.col.span-4.sidebar
+    == partial 'theme/sidebar'

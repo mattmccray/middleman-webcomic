@@ -21,7 +21,12 @@ module Middleman
         all << comic if comic.publishable?
       end
 
-      all.sort! {|x,y| y.pub_date <=> x.pub_date }
+      if app.settings.webcomic_sort_by == :publish_date
+        all.sort! {|x,y| y.pub_date <=> x.pub_date }
+      else
+        fld= app.settings.webcomic_sort_by
+        all.sort! {|x,y| y[fld] <=> x[fld] }
+      end
     
       # Update all the position info...
       cl= all.length

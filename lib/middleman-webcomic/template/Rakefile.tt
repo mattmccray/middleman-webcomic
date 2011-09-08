@@ -1,8 +1,12 @@
-require 'middleman-webcomic/tasks'
+# Settings:
+NOTES_PATH= File.expand_path("./comics/notes")
+IMAGE_PATH= File.expand_path("./comics/images")
 
 # For the SYNC task
 SERVER='USERNAME@YOURSITE.COM'
 FOLDER="~/YOURSITE.COM"
+
+require 'middleman-webcomic/tasks'
 
 desc "Runs server"
 task :server do
@@ -21,3 +25,4 @@ task :sync=>:build do
   system(cmd)
   puts "Done."
 end
+

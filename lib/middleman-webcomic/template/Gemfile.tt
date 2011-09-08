@@ -4,4 +4,4 @@ gem "middleman"
 gem 'slim'
 gem 'coffee-script'
 gem 'builder'
-gem "webcomic-middleman", :git=>"git@github.com:darthapo/middleman-webcomic.git"
+gem "middleman-webcomic" #, :git=>"git@github.com:darthapo/middleman-webcomic.git"

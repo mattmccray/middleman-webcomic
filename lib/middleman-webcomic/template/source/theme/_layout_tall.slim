@@ -1,0 +1,17 @@
+
+section#main role="main"
+
+  div.row
+    div.col.span-8
+      div.comic
+        == partial "theme/comic"
+        div.clear
+
+    div.col.span-4
+      == partial 'theme/sidebar'
+
+  div.row
+    div.col.span-8
+      div.main-content
+        == current_comic.content
+        div.clear

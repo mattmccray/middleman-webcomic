@@ -13,9 +13,10 @@ set :webcomic_domain, "http://my-site.com"
 set :webcomic_source, "comics/notes"
 set :webcomic_source_images, "comics/images"
 set :webcomic_images, "media/comics"
-set :webcomic_enable_stories, true
+set :webcomic_enable_stories, false
 set :webcomic_slug_field, :position
 set :webcomic_include_comic_in_feed, true
+set :webcomic_sort_by, :slug # or slug? and metadata
 
 Slim::Engine.set_default_options :pretty => true
 
@@ -34,10 +35,10 @@ page "/feed.xml", :layout => false
 
 
 # Change the CSS directory
-set :css_dir, "theme/stylesheets"
+set :css_dir, "theme/styles"
 
 # Change the JS directory
-set :js_dir, "theme/javascripts"
+set :js_dir, "theme/scripts"
 
 # Change the images directory
 set :images_dir, "media"

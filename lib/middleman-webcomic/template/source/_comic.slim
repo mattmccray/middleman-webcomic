@@ -1,8 +1,0 @@
-section#comic role="comic"
-  div.row
-    div.col.span-12.comic-container
-      h2.comic-title
-        a href="#{{comic_path_for comic}}"
-          span.number ##{comic.position} - 
-          span.title #{comic.title}
-      == image_tag comic_image_for(comic), :alt=>(comic.alt || comic.title), :title=>(comic.alt || "")
