@@ -4,7 +4,7 @@ $:.unshift lib unless $:.include?(lib)
 require 'middleman-webcomic/version'
 
 Gem::Specification.new do |s|
-   s.name = %q{webcomic-middleman}
+   s.name = %q{middleman-webcomic}
    s.version = Middleman::Webcomic::VERSION
    s.platform = Gem::Platform::RUBY
    s.rubyforge_project = 'middleman-webcomic'
@@ -14,7 +14,7 @@ Gem::Specification.new do |s|
    s.authors = ["Matt McCray"]
    s.email = %q{matt@inkwellian.com}
    s.summary = %q{A MiddleMan extension for generating webcomic sites.}
-   s.homepage = %q{https://github.com/darthapo/webcomic-middleman}
+   s.homepage = %q{https://github.com/darthapo/middleman-webcomic}
    s.description = %q{Use MiddleMan to create your webcomic site with this extension.}
 
    s.files         = `git ls-files`.split("\n")

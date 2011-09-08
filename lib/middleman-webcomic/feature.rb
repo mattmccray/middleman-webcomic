@@ -15,6 +15,7 @@ module Middleman
           app.set :webcomic_source_type, :markdown
           app.set :webcomic_uri, "comics"
           app.set :webcomic_template, "/comics/template.html"
+          app.set :webcomic_domain, "http://MYSITE.dev" # ?
           
           # ???
           app.set :webcomic_enable_stories, false
@@ -24,8 +25,10 @@ module Middleman
           app.set :webcomic_enable_tags, false
           app.set :webcomic_sort_by, :publish_date # or slug? and metadata
           app.set :webcomic_slug_field, :slug
+          
+          app.set :webcomic_include_comic_in_feed, true
 
-          app.helpers ::Middleman::Webcomic::Helpers
+          app.helpers ::Middleman::Features::Webcomic::Helpers
       
           app.after_configuration do
             comics, stories= ::Middleman::Webcomic.load_from( File.join(app.root, app.settings.webcomic_source), app )

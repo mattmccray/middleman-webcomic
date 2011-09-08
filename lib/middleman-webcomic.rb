@@ -5,6 +5,7 @@ else
   $KCODE = "UTF-8"
 end
 
+require 'middleman-webcomic/version'
 require 'middleman-webcomic/data'
-require "middleman-webcomic/feature"
-require "middleman-webcomic/template"
+require 'middleman-webcomic/feature'
+require 'middleman-webcomic/template'

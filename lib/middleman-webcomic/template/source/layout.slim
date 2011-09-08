@@ -61,22 +61,22 @@ html
     
     section#main role="main"
       div.row
-        div.col.span-7
+        div.col.span-8
           div.main-content
             - if data.page.title
               h2== data.page.title
             == yield
             div.clear
 
-        div.col.span-5
+        div.col.span-4
           == partial 'sidebar'
 
     section#footer role="footer"
       div.row
-        div.col.span-6
+        div.col.span-8
           footer
             markdown:
-              &copy; [Me](http://www.my-site.com), all rights reserved. This site is built with [Middleman](http://middlemanapp.com/) and [Webcomic](https://github.com/darthapo/webcomic-middleman).
+              &copy; [Me](http://www.my-site.com), all rights reserved. This site is built with [Middleman](http://middlemanapp.com/) and [Webcomic](https://github.com/darthapo/middleman-webcomic).
     
 
   javascript:

@@ -1,0 +1,23 @@
+require 'middleman-webcomic/tasks'
+
+# For the SYNC task
+SERVER='USERNAME@YOURSITE.COM'
+FOLDER="~/YOURSITE.COM"
+
+desc "Runs server"
+task :server do
+  system "middleman server"
+end
+
+desc "Runs build"
+task :build do
+  system "middleman build"
+end
+
+desc "Syncs with public server using rsync (if configured)"
+task :sync=>:build do
+  cmd= "rsync -avz --delete build/ #{SERVER}:#{FOLDER}"
+  puts "Running:\n#{cmd}\n"
+  system(cmd)
+  puts "Done."
+end
