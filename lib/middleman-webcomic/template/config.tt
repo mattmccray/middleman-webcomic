@@ -1,0 +1,191 @@
+activate :webcomic
+
+
+
+page "/feed.xml", :layout => false
+
+# Build-specific configuration
+configure :build do
+  # For example, change the Compass output style for deployment
+  # activate :minify_css
+  
+  # Minify Javascript on build
+  # activate :minify_javascript
+  
+  # Enable cache buster
+  # activate :cache_buster
+end
+
+
+
+
+require 'slim'
+require 'coffee-script'
+require 'json'
+require 'builder'
+require 'active_support/all'
+
+# activate :automatic_image_sizes
+activate :directory_indexes
+activate :webcomic
+
+set :webcomic_domain, "http://my-site.com"
+
+set :webcomic_source, "comics/notes"
+set :webcomic_source_images, "comics/images"
+set :webcomic_images, "media/comics"
+set :webcomic_enable_stories, true
+set :webcomic_slug_field, :position
+set :webcomic_include_comic_in_feed, true
+
+Slim::Engine.set_default_options :pretty => true
+
+set :markdown, :layout_engine => :slim
+set :erb, :layout_engine => :slim
+
+if defined? Encoding
+  Encoding.default_internal = Encoding.default_external = "UTF-8"
+else
+  $KCODE = "UTF-8"
+end
+
+require 'tilt'
+Tilt.register Tilt::ERBTemplate, 'html'
+
+
+app=self
+
+after_configuration do |app|
+  articles_glob = File.join(app.views, "posts/*.*")
+  blog_summary_separator= /READMORE/
+
+  articles = Dir[articles_glob].map do |article| unless File.basename(article) == "category.html.slim"
+    template_content = File.read(article)
+    data, content = app.parse_front_matter(template_content)
+    
+    data["pub_date"]= data["publish_date"]= case data["publish_date"]
+      when String
+        Date.parse(data["publish_date"])
+      else
+        data["publish_date"]
+      end
+
+    data["raw"] = content
+    data["url"] = article.gsub(app.views, "").split(".html").first #+ ".html"
+
+    all_content = Tilt.new(article).render
+    data["body"] = all_content #.gsub!(blog_summary_separator, "")
+    
+    Thor::CoreExt::HashWithIndifferentAccess.new data
+  end end
+  
+  articles.reject! { |a| a.nil? }
+  articles.sort! { |a, b| b["publish_date"] <=> a["publish_date"] }
+
+  cats = Thor::CoreExt::HashWithIndifferentAccess.new({})
+  articles.each do |article|
+    article["category"] ||= ""
+    if !article["category"].empty?
+      tags_array = article["category"].split(',').map{|t| t.strip}
+      article['categories']= []
+      tags_array.each do |tag_title|
+        tag_key = tag_title.parameterize
+        tag_path = "/posts/category/#{tag_key}" #blog_taglink.gsub(/(:\w+)/, tag_key)
+        
+        (cats[tag_path] ||= Thor::CoreExt::HashWithIndifferentAccess.new({}))["title"] = tag_title
+        cats[tag_path]["ident"] = tag_key
+        (cats[tag_path]["pages"] ||= []) << article
+        
+        article['categories'] << Thor::CoreExt::HashWithIndifferentAccess.new( :path=>tag_path, :title=>tag_title)
+      end
+    end
+  end
+
+  # Create pages for
+  # /posts/page/1...N
+  article_pager= Pager.new articles, "/posts/page"
+  article_pager.each do |page_set|
+    page "#{page_set.uri}.html", :proxy=>"/theme/page_set_template.html", :ignore=>true do
+      #@title = "From The Blog: #{category.title}"
+      @articles = page_set.articles
+      @current_page = page_set.page
+      @pager= article_pager
+    end
+  end
+  
+  app.data_content("blog", { :articles => articles, :categories => cats, :pager=>article_pager })
+  
+  # /posts/category/:category
+  cats.each_pair do |path, category|
+    # category hss "title" "ident"(slug) "pages"(articles)
+    idx= 1
+    cat_pager= Pager.new(category["pages"], path)
+    
+    cat_pager.each do |page_set|
+      page "#{path}/#{page_set.page}.html", :proxy=>"/theme/page_set_template.html", :ignore=>true do
+        @title = "Category: #{category.title}"
+        @articles = page_set.articles
+        @current_page = page_set.page
+        @pager= cat_pager
+      end
+    end
+    
+    page "#{path}.html", :proxy => "/theme/page_set_template.slim", :ignore=>true do
+      @title = "Category: #{category.title}"
+      @articles = cat_pager.page_sets[0]
+      @current_page= 1
+      @pager= cat_pager
+    end
+  end
+  
+  true
+end
+
+
+
+# Page command
+page "/feed.xml", :layout => false
+
+# Helpers
+# Methods defined in the helpers block are available in templates
+# helpers do
+#   # Your helpers here
+# end
+
+
+
+# Change the CSS directory
+set :css_dir, "theme/stylesheets"
+
+# Change the JS directory
+set :js_dir, "theme/javascripts"
+
+# Change the images directory
+set :images_dir, "media"
+
+
+# Build-specific configuration
+configure :build do
+  
+  data_content 'build', true
+  
+  # For example, change the Compass output style for deployment
+  activate :minify_css
+  
+  # Minify Javascript on build
+  activate :minify_javascript
+  
+  # Enable cache buster
+  activate :cache_buster
+  
+  # Use relative URLs
+  # activate :relative_assets
+  
+  # Compress PNGs after build
+  # First: gem install middleman-smusher
+  # require "middleman-smusher"
+  # activate :smusher
+  
+  # Or use a different image path
+  # set :http_path, "/Content/images/"
+end

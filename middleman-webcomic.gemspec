@@ -1,13 +1,13 @@
 lib = File.expand_path('../lib/', __FILE__)
 $:.unshift lib unless $:.include?(lib)
 
-require 'webcomic/version'
+require 'middleman-webcomic/version'
 
 Gem::Specification.new do |s|
    s.name = %q{webcomic-middleman}
-   s.version = Webcomic::VERSION
+   s.version = Middleman::Webcomic::VERSION
    s.platform = Gem::Platform::RUBY
-   s.rubyforge_project = 'webcomic-middleman'
+   s.rubyforge_project = 'middleman-webcomic'
    s.has_rdoc = false
    s.date = Time.now.strftime "%Y-%m-%d"
 

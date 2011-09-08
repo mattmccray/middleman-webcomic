@@ -1,29 +1,16 @@
 # Webcomic for MiddleMan
 
-This is how you'll setup the runtime, using bundler:
+*Updated for Middleman auto-discovery.*
 
-`Gemfile`
+After you install the gem:
 
-    source "http://rubygems.org"
-    gem "webcomic-middleman", :git=>"git@github.com:darthapo/webcomic-middleman.git", :require=>'webcomic'
+    gem install middleman-webcomic
 
+Create a new webcomic site like this:
 
-`config.rb`
+    middleman init MY_SITE --template=webcomic
 
-    require "webcomic"
-
-    activate :webcomic
-
-    set :webcomic_images, "media/comics" # Or wherever...
-
-
-`config.ru`
-
-    require 'rubygems'
-    require 'bundler/setup'
-    require 'middleman'
-
-    run Middleman.server
+Then customize to your satisfaction.
 
 # Live Sites
 
@@ -31,3 +18,5 @@ This extension is used in conjunction with MiddleMan on the following sites:
 
 * [ZooDotCom](http://www.zoodotcom.com)
 * [Tactless Comics](http://tactless.inkwellian.com)
+* [Darkshore Detectives](http://darkshore.inkwellian.com)
+

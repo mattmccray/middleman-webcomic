@@ -6,7 +6,7 @@ module Middleman
       class << self
 
         def registered(app)
-          puts "Webcomic v#{::Webcomic::VERSION}"
+          puts "Webcomic v#{::Middleman::Webcomic::VERSION}"
       
           # Default settings:
           app.set :webcomic_images, "images/comics"
@@ -25,10 +25,10 @@ module Middleman
           app.set :webcomic_sort_by, :publish_date # or slug? and metadata
           app.set :webcomic_slug_field, :slug
 
-          app.helpers ::Webcomic::Helpers
+          app.helpers ::Middleman::Webcomic::Helpers
       
           app.after_configuration do
-            comics, stories= ::Webcomic.load_from( File.join(app.root, app.settings.webcomic_source), app )
+            comics, stories= ::Middleman::Webcomic.load_from( File.join(app.root, app.settings.webcomic_source), app )
 
             # puts comics.inspect
 
@@ -71,10 +71,99 @@ module Middleman
             }
           end
           
-          ::Webcomic::Admin.define app
+          ::Middleman::Webcomic::Admin.define app
         end
         alias :included :registered
 
+      end
+    
+      module Helpers
+        def current_comic
+          (@comic || last_comic)
+        end
+
+        def first_comic
+          data.webcomic.strips.last
+        end
+
+        def last_comic
+          data.webcomic.strips.first
+        end
+
+        def next_comic
+          current_comic.next
+        end
+
+        def prev_comic
+          current_comic.prev
+        end
+
+        def comic_image_url(comic)
+          "/#{settings.webcomic_images}/#{comic.filename}"
+        end
+        alias :comic_image_for :comic_image_url
+
+        def current_comic_image
+          comic_image_for current_comic
+        end
+        alias :current_comic_image_url :current_comic_image
+
+        def comic_path_url(comic)
+          "/#{settings.webcomic_uri}/#{comic[settings.webcomic_slug_field]}"
+        end
+        alias :comic_path_for :comic_path_url
+
+        def current_comic_path
+          comic_path_for current_comic
+        end
+
+        def first_comic_path
+          comic_path_for first_comic
+        end
+
+        def last_comic_path
+          comic_path_for last_comic
+        end
+
+        def next_comic_path
+          comic_path_for next_comic
+        end
+
+        def prev_comic_path
+          comic_path_for prev_comic
+        end
+
+
+        # Story Helpers
+        def start_story_path_for(object)
+          story = if object.is_a? Story
+            object
+          else # it's a comic... right?
+            data.webcomic.stories.detect  {|s| s.title == object.story }
+          end
+          comic_path_for story.comics.last
+        end
+
+        def story_path_for(object)
+          story = if object.is_a? Story
+            object
+          else # it's a comic... right?
+            data.webcomic.stories.detect  {|s| s.title == object.story }
+          end
+          "/#{settings.webcomic_story_uri}/#{story.slug}"
+        end
+        
+        # Feed Helpers
+        
+        def feed_data
+          data.webcomic.strips[0...10]
+        end
+        
+        def feed_absolute_paths(source, path=settings.webcomic_domain)
+          source.gsub( /src=(["']*)\//) do |match|
+            "#{match[0...-1]}#{path}/"
+          end
+        end
       end
     end
   end
