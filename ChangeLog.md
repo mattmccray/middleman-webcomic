@@ -1,3 +1,6 @@
+# v0.5.1
+- Bugfix for stories.
+
 # v0.5.0
 - Updated to support Middleman's new auto-discovery.
 - Includes boilerplate site.

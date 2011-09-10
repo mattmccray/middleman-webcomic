@@ -138,7 +138,7 @@ module Middleman
 
         # Story Helpers
         def start_story_path_for(object)
-          story = if object.is_a? Story
+          story = if object.is_a? ::Middleman::Webcomic::Story
             object
           else # it's a comic... right?
             data.webcomic.stories.detect  {|s| s.title == object.story }
